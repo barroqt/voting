@@ -48,10 +48,6 @@ contract VotingService is Ownable {
         emit VoterRegistered(_voter);
     }
 
-    // function generateRandomId() private view returns(uint) {
-    //     return uint(keccak256(block.difficulty, now, voters));
-    // }
-
     function registerProposal(string memory _description) public {
         require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, "Impossible to register a proposal now.");
         require(voters[msg.sender].isRegistered, "You haven't been whitelisted.");
@@ -59,7 +55,6 @@ contract VotingService is Ownable {
         uint proposalId = proposals.length;
         Proposal memory proposal = Proposal(_description, 0);
 
-        voters[msg.sender].votedProposalId = proposalId;
         proposals.push(proposal);
         emit ProposalRegistered(proposalId);
     }
