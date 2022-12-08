@@ -37,7 +37,7 @@ contract VotingService is Ownable {
     event ProposalRegistered(uint proposalId);
     event Voted (address voter, uint proposalId);
 
-    constructor() public {
+    constructor() {
         workflowStatus = WorkflowStatus.RegisteringVoters;
     }
 
@@ -70,9 +70,9 @@ contract VotingService is Ownable {
         emit Voted (msg.sender, _proposalId);
     }
 
-    function voteTally() public onlyOwner {
-        require(workflowStatus == WorkflowStatus.VotingSessionStarted, "Impossible to count votes now.");
-        
+    function countVotes() public onlyOwner {
+        require(workflowStatus == WorkflowStatus.VotingSessionEnded, "Impossible to count votes now.");
+
         uint currentBest = 0;
         for(uint i = 0; i < proposals.length; i++) {
             if (proposals[i].voteCount > currentBest) {
@@ -85,10 +85,12 @@ contract VotingService is Ownable {
     function seeWinningProposalDetails() public view returns (Proposal memory) {
         require(workflowStatus == WorkflowStatus.VotesTallied, "Votes haven't been counted yet.");
         
+        // For example, if proposal with ID 0 wins, name of proposal "prop1", and 2 votes, remix will show: 
+        // 0: tuple(string,uint256): prop1,2
         return proposals[winningProposalId];
     }
 
-    // Functions related to the workflow
+    // Functions related to the workflow 
     function startProposals() public onlyOwner {
         require(workflowStatus == WorkflowStatus.RegisteringVoters, "Too late to start proposals.");
 
@@ -117,7 +119,7 @@ contract VotingService is Ownable {
         emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded);
     }
 
-    function startVoteTally() public onlyOwner {
+    function voteTallied() public onlyOwner {
         require(workflowStatus == WorkflowStatus.VotingSessionEnded, "Impossible to proceed to vote tally now.");
 
         workflowStatus = WorkflowStatus.VotesTallied;
