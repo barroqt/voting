@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import '@openzeppelin/contracts/ownership/Ownable.sol';
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VotingService is Ownable {
     struct Voter {
@@ -74,7 +74,7 @@ contract VotingService is Ownable {
         require(workflowStatus == WorkflowStatus.VotingSessionStarted, "Impossible to count votes now.");
         
         uint currentBest = 0;
-        for(uint i = 0; proposals.length; i++) {
+        for(uint i = 0; i < proposals.length; i++) {
             if (proposals[i].voteCount > currentBest) {
                 currentBest = proposals[i].voteCount;
                 winningProposalId = i;
@@ -82,7 +82,7 @@ contract VotingService is Ownable {
         }
     }
 
-    function seeWinningProposalDetails() public view returns (Proposal) {
+    function seeWinningProposalDetails() public view returns (Proposal memory) {
         require(workflowStatus == WorkflowStatus.VotesTallied, "Votes haven't been counted yet.");
         
         return proposals[winningProposalId];
