@@ -3,6 +3,9 @@ pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+// TODO: Add more comments
+// TODO: Timestamps?
+
 contract VotingService is Ownable {
     struct Voter {
         bool isRegistered;
@@ -43,6 +46,7 @@ contract VotingService is Ownable {
 
     function whitelistVoter(address _voter) public onlyOwner {
         require(workflowStatus == WorkflowStatus.RegisteringVoters, "Too late to add a voter.");
+        require(msg.sender != _voter, "The admin is not allowed to vote.");
 
         voters[_voter].isRegistered = true;
         emit VoterRegistered(_voter);
@@ -88,6 +92,12 @@ contract VotingService is Ownable {
         // For example, if proposal with ID 0 wins, name of proposal "prop1", and 2 votes, remix will show: 
         // 0: tuple(string,uint256): prop1,2
         return proposals[winningProposalId];
+    }
+
+    function seeProposalVoteCount(uint _proposalId) public view returns (uint) {
+        require(workflowStatus == WorkflowStatus.VotesTallied, "Votes haven't been counted yet.");
+        
+        return proposals[_proposalId].voteCount;
     }
 
     // Functions related to the workflow 
