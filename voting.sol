@@ -3,8 +3,6 @@ pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// TODO: Timestamps?
-
 /// @notice A public voting system for new proposals.
 contract VotingService is Ownable {
     struct Voter {
@@ -80,7 +78,7 @@ contract VotingService is Ownable {
         _;
     }
 
-    /// @notice Registers a new proposal.
+    /// @notice Lets a whitelisted user register a new proposal.
     /// @param _description Name of the proposal.
     function registerProposal(string memory _description) public isWhitelisted {
         require(
@@ -98,7 +96,7 @@ contract VotingService is Ownable {
         emit ProposalRegistered(proposalId);
     }
 
-    /// @notice Starts proposal phase when called by the admin. Ends whitelisting phase.
+    /// @notice Lets a whitelisted user cast a vote to a proposal.
     /// @param _proposalId The ID of the proposal that is voted for.
     function voteForProposal(uint256 _proposalId) public isWhitelisted {
         require(
@@ -119,7 +117,7 @@ contract VotingService is Ownable {
         emit Voted(msg.sender, _proposalId);
     }
 
-    /// @notice Starts proposal phase when called by the admin. Ends whitelisting phase.
+    /// @notice Uses the number of votes to find which proposal wins.
     function countVotes() public onlyOwner {
         require(
             workflowStatus == WorkflowStatus.VotingSessionEnded,
@@ -141,7 +139,7 @@ contract VotingService is Ownable {
         }
     }
 
-    /// @notice Starts proposal phase when called by the admin. Ends whitelisting phase.
+    /// @notice Shows details, name and number of votes for a given proposal.
     /// @return The proposal that had the most votes, in a struct format.
     function seeWinningProposalDetails() public view returns (Proposal memory) {
         require(
@@ -149,12 +147,12 @@ contract VotingService is Ownable {
             "Votes haven't been counted yet."
         );
 
-        /// e.g. If proposal with ID 0 wins, name of proposal "prop1", and 2 votes, remix will show:
+        /// e.g. If the name of proposal is "prop1", and it has 2 votes, remix will show:
         /// 0: tuple(string,uint256): prop1,2
         return proposals[winningProposalId];
     }
 
-    /// @notice Starts proposal phase when called by the admin. Ends whitelisting phase.
+    /// @notice Shows the number of votes for a given proposal.
     /// @param _proposalId The ID of the proposal inspected by the user.
     /// @return The vote count of the proposal.
     function seeProposalVoteCount(uint256 _proposalId)
